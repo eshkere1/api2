@@ -1,7 +1,11 @@
 import requests
+import os
+import argparse
+from dotenv import load_dotenv
+load_dotenv()
 
 
-API_KEY="d1e2691a52f3894b1076886c"
+API_KEY=os.getenv("API_KEY")
 
 
 def get_conversion_rates(currency):
@@ -12,12 +16,21 @@ def get_conversion_rates(currency):
 
 
 def get_target_money(base_money, target_currency, conversion_rates):
-    factor = conversion_rates[target_currency.upper()]
-    return int(base_money) * factor
+    curse = conversion_rates[target_currency.upper()]
+    print(f"Курс: {curse}")
+    return float(base_money) * curse
 
+
+def main():
+    parser = argparse.ArgumentParser(description=" Эта программа переводит деньги на другую валюту")
+    parser.add_argument("-b", "--base", help="Введите код базовой валюты(например rub)", required=True)
+    parser.add_argument("-t", "--target", help="Введите код целевой валюты(например eur)", required=True)
+    parser.add_argument("-a", "--amount", help="Введите сумму", required=True)
+    args = parser.parse_args()
+    print(f"Конвертируемая сумма: {get_target_money(args.amount, args.target, get_conversion_rates(args.base))} {args.target.upper()}")
 
 if __name__ == "__main__":
-    base_currency = input("Введите код базовой валюты(например rub):")
-    target_currency = input("Введите код целевой валюты(например rub):")
-    base_money = input("Введите сумму")
-    print(get_target_money(base_money, target_currency, get_conversion_rates(base_currency)))
+    try:
+        main()
+    except HTTPError:
+        print("Вы доаустили ошибку в запросе")
